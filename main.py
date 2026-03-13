@@ -1,6 +1,7 @@
 import pandas as pd
 import psycopg2
 from datetime import datetime, timezone
+import os
 
 
 # =========================
@@ -55,16 +56,10 @@ print(df_long.head())
 # =========================
 # 5. Koneksi PostgreSQL
 # =========================
-DATABASE_URL = "postgresql://postgres:UlyadLPypsJpcfiEIYSzjkWwAtiOFOmG@postgres.railway.internal:5432/railway"
+DATABASE_URL = os.getenv(
+    "DATABASE_URL", "postgresql://dnpeng:dnpeng7240@localhost:5432/dnpeng_db"
+)
 conn = psycopg2.connect(DATABASE_URL)
-
-# conn = psycopg2.connect(
-#     host="localhost",
-#     database="dnpeng_db",
-#     user="dnpeng",
-#     password="dnpeng7240",
-#     port=5432,
-# )
 
 cur = conn.cursor()
 
