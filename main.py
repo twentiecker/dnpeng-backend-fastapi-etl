@@ -55,7 +55,7 @@ print(df_long.head())
 # =========================
 # 5. Koneksi PostgreSQL
 # =========================
-DATABASE_URL = "postgresql://postgres:UlyadLPypsJpcfiEIYSzjkWwAtiOFOmG@nozomi.proxy.rlwy.net:29348/railway"
+DATABASE_URL = "postgresql://postgres:UlyadLPypsJpcfiEIYSzjkWwAtiOFOmG@postgres.railway.internal:5432/railway"
 conn = psycopg2.connect(DATABASE_URL)
 
 # conn = psycopg2.connect(
