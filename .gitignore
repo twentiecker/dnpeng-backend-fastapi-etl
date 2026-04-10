@@ -215,5 +215,7 @@ __marimo__/
 # Streamlit
 .streamlit/secrets.toml
 
-# Excel File
-pkrt.xlsx
+# File
+data/
+pkrt_final.xlsx
+pdb_final.xlsx

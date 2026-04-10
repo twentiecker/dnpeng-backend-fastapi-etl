@@ -20,7 +20,7 @@ def parse_periode(p):
 # =========================
 # 1. Baca Excel
 # =========================
-file_path = "pkrt_dummy.xlsx"
+file_path = "pkrt_final.xlsx"
 
 df = pd.read_excel(file_path, sheet_name="Nilai PKRT Bulanan")
 # df = pd.read_excel(file_path, sheet_name="Nilai PKRT Triwulanan")
@@ -28,9 +28,21 @@ df = pd.read_excel(file_path, sheet_name="Nilai PKRT Bulanan")
 # =========================
 # 2. Wide → Long
 # =========================
-df_long = df.melt(id_vars=["Kode", "Deskripsi"], var_name="periode", value_name="nilai")
+df_long = df.melt(
+    id_vars=["Kode", "Deskripsi", "Satuan", "Konversi"],
+    var_name="periode",
+    value_name="nilai",
+)
 
-df_long.rename(columns={"Kode": "kode", "Deskripsi": "deskripsi"}, inplace=True)
+df_long.rename(
+    columns={
+        "Kode": "kode",
+        "Deskripsi": "deskripsi",
+        "Satuan": "satuan",
+        "Konversi": "konversi",
+    },
+    inplace=True,
+)
 
 # =========================
 # 3. Bersihkan nilai
@@ -68,8 +80,8 @@ cur = conn.cursor()
 # =========================
 insert_query = """
 INSERT INTO pkrt
-(kode, deskripsi, tahun, freq, period, nilai, created_at)
-VALUES (%s,%s,%s,%s,%s,%s,%s)
+(kode, deskripsi, tahun, freq, period, nilai, created_at, satuan, konversi)
+VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)
 ON CONFLICT (kode, tahun, freq, period)
 DO UPDATE SET
     nilai = EXCLUDED.nilai
@@ -86,6 +98,8 @@ for _, row in df_long.iterrows():
             row["period"],
             row["nilai"],
             row["created_at"],
+            row["satuan"],
+            row["konversi"],
         ),
     )
 
