@@ -1,4 +1,4 @@
-import subprocess
+﻿import subprocess
 import sys
 import time
 from datetime import datetime
@@ -12,6 +12,28 @@ etl_files = [
     "etl_pmtb.py",
     "etl_eksim.py",
     "etl_pdb.py",
+    "etl_transaksi_regional.py",
+    "etl_wisnus_asal.py",
+    "etl_impor_barang_konsumsi.py",
+    "etl_realisasi_semen.py",
+    "etl_belanja_apbn.py",
+    "etl_wisnus_tujuan.py",
+    "etl_ekspor_hs2.py",
+    "etl_ekspor_hs2_raw.py",
+    "etl_pma_pmdn.py",
+    "etl_apbd.py",
+    "etl_master_wilayah.py",
+    "etl_master_kppbc.py",
+    "etl_kursi_bulanan_eksim.py",
+    "etl_alokasi_apbn.py",
+    "etl_modal_tetap.py",
+    "etl_vol_impor_hs2.py",
+    "etl_vol_ekspor_hs2.py",
+    "etl_nilai_impor_hs2.py",
+    "etl_nilai_ekspor_hs2.py",
+    "etl_nilai_ekspor_hs2_raw.py",
+    "etl_impor_barang.py",
+    "etl_alokasi_apbn_stik.py",
 ]
 
 # ===============================
