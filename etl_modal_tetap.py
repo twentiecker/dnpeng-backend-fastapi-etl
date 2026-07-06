@@ -65,7 +65,7 @@ def process_sheet(file_path, sheet_name):
 
 
 if __name__ == "__main__":
-    file_path = "regional/30-44 Modal tetap .xlsx"
+    file_path = "data/indikator/regional/30-44 Modal tetap .xlsx"
 
     # DATABASE_URL = os.getenv(
     #     "DATABASE_URL", "postgresql://dnpeng:dnpeng7240@localhost:5432/dnpeng_db"
@@ -129,3 +129,4 @@ if __name__ == "__main__":
     # finally:
     #     cur.close()
     #     conn.close()
+

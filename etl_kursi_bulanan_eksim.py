@@ -57,7 +57,7 @@ def process_sheet(file_path, sheet_name):
 
 
 if __name__ == "__main__":
-    file_path = "regional/Kursi bulanan eksim.xlsx"
+    file_path = "data/indikator/regional/Kursi bulanan eksim.xlsx"
 
     # DATABASE_URL = os.getenv(
     #     "DATABASE_URL", "postgresql://dnpeng:dnpeng7240@localhost:5432/dnpeng_db"
@@ -115,3 +115,4 @@ if __name__ == "__main__":
     # finally:
     #     cur.close()
     #     conn.close()
+

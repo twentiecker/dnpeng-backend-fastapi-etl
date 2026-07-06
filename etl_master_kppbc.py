@@ -1,4 +1,4 @@
-import pandas as pd
+﻿import pandas as pd
 import psycopg2
 from datetime import datetime, timezone
 import os
@@ -27,7 +27,7 @@ def process_sheet(file_path, sheet_name):
 
 
 if __name__ == "__main__":
-    file_path = "regional/RAW_Impor_master_kppbc.xlsx"
+    file_path = "data/indikator/regional/RAW_Impor_master_kppbc.xlsx"
 
     # DATABASE_URL = os.getenv(
     #     "DATABASE_URL", "postgresql://dnpeng:dnpeng7240@localhost:5432/dnpeng_db"
@@ -82,3 +82,4 @@ if __name__ == "__main__":
     # finally:
     #     cur.close()
     #     conn.close()
+
