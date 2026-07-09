@@ -43,7 +43,7 @@ PROV_MAP = {
     "Papua Selatan": "95",
     "Papua Tengah": "96",
     "Papua Pegunungan": "97",
-    "INDONESIA": "00"
+    "INDONESIA": "00",
 }
 
 
@@ -52,7 +52,7 @@ def parse_periode(p):
         p = str(p)
 
     p = p.strip()
-    m = re.match(r'(\d{4})\s*-\s*Q([1-4])', p, re.IGNORECASE)
+    m = re.match(r"(\d{4})\s*-\s*Q([1-4])", p, re.IGNORECASE)
     if m:
         tahun = int(m.group(1))
         period = int(m.group(2))
@@ -90,77 +90,85 @@ def process_sheet(file_path, sheet_name, deskripsi_prefix):
     df_long["kode_wilayah"] = df_long["provinsi"].map(PROV_MAP)
     df_long = df_long[df_long["kode_wilayah"].notna()]
 
-    df_long["kode"] = "Q-" + sheet_name
+    df_long["kode"] = "Q" + sheet_name
     df_long["deskripsi"] = deskripsi_prefix
     df_long["satuan"] = "juta rupiah"
     df_long["konversi"] = "SUM"
     df_long["created_at"] = datetime.now(timezone.utc)
 
     return df_long[
-        ["kode_wilayah", "tahun", "freq", "period", "nilai", "kode", "deskripsi", "satuan", "konversi", "created_at"]
+        [
+            "kode_wilayah",
+            "tahun",
+            "freq",
+            "period",
+            "nilai",
+            "kode",
+            "deskripsi",
+            "satuan",
+            "konversi",
+            "created_at",
+        ]
     ]
 
 
 if __name__ == "__main__":
     file_path = "data/indikator/regional/24-26 Realisasi PMA PDMN BKPM 2010-2026.xlsx"
 
-    # DATABASE_URL = os.getenv(
-    #     "DATABASE_URL", "postgresql://dnpeng:dnpeng7240@localhost:5432/dnpeng_db"
-    # )
+    DATABASE_URL = os.getenv(
+        "DATABASE_URL", "postgresql://dnpeng:dnpeng7240@localhost:5432/dnpeng_db"
+    )
 
-    # conn = psycopg2.connect(DATABASE_URL)
-    # cur = conn.cursor()
+    conn = psycopg2.connect(DATABASE_URL)
+    cur = conn.cursor()
 
     try:
-        print("Truncate table transaksi_regional...")
-        # cur.execute("TRUNCATE TABLE transaksi_regional RESTART IDENTITY;")
-        # conn.commit()
+        print("Add table PMTB: PMA dan PMDN...")
 
         sheets = [
             ("PMA", "PMA"),
             ("PMDN", "PMDN"),
         ]
 
-        # insert_query = """
-        # INSERT INTO transaksi_regional
-        # (kode_wilayah, tahun, freq, period, nilai, kode, deskripsi, satuan, konversi, created_at)
-        # VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
-        # """
+        insert_query = """
+        INSERT INTO pmtb
+        (kode_wilayah, tahun, freq, period, nilai, kode, deskripsi, satuan, konversi, created_at)
+        VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+        """
 
         total_rows = 0
 
         for sheet_name, deskripsi_prefix in sheets:
             df_long = process_sheet(file_path, sheet_name, deskripsi_prefix)
 
-            # for _, row in df_long.iterrows():
-            #     cur.execute(
-            #         insert_query,
-            #         (
-            #             row["kode_wilayah"],
-            #             int(row["tahun"]),
-            #             row["freq"],
-            #             int(row["period"]),
-            #             row["nilai"],
-            #             row["kode"],
-            #             row["deskripsi"],
-            #             row["satuan"],
-            #             row["konversi"],
-            #             row["created_at"],
-            #         ),
-            #     )
+            for _, row in df_long.iterrows():
+                cur.execute(
+                    insert_query,
+                    (
+                        row["kode_wilayah"],
+                        int(row["tahun"]),
+                        row["freq"],
+                        int(row["period"]),
+                        row["nilai"],
+                        row["kode"],
+                        row["deskripsi"],
+                        row["satuan"],
+                        row["konversi"],
+                        row["created_at"],
+                    ),
+                )
 
             total_rows += len(df_long)
-            # conn.commit()
+            conn.commit()
             print(f"{sheet_name} selesai ({len(df_long)} rows)")
             print(df_long)
 
         print(f"\nSemua data berhasil dimasukkan ({total_rows} rows)")
 
     except Exception as e:
-        # conn.rollback()
+        conn.rollback()
         print("ERROR:", e)
 
-    # finally:
-    #     cur.close()
-    #     conn.close()
-
+    finally:
+        cur.close()
+        conn.close()

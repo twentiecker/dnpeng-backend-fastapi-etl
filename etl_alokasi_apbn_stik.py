@@ -10,7 +10,7 @@ def parse_periode(p):
         p = str(p)
 
     p = p.strip()
-    m = re.match(r'(\d{4})Q([1-4])', p, re.IGNORECASE)
+    m = re.match(r"(\d{4})Q([1-4])", p, re.IGNORECASE)
     if m:
         tahun = int(m.group(1))
         period = int(m.group(2))
@@ -30,12 +30,17 @@ def process_sheet(file_path, sheet_name):
         value_name="nilai",
     )
 
-    df_long.rename(columns={
-        "Kode BPS": "kode_wilayah",
-        "Urut APBN": "rank_apbn",
-    }, inplace=True)
+    df_long.rename(
+        columns={
+            "Kode BPS": "kode_wilayah",
+            "Urut APBN": "rank_apbn",
+        },
+        inplace=True,
+    )
 
-    df_long["kode_wilayah"] = df_long["kode_wilayah"].astype(str).str.extract(r"(\d+)")[0]
+    df_long["kode_wilayah"] = (
+        df_long["kode_wilayah"].astype(str).str.extract(r"(\d+)")[0]
+    )
     df_long = df_long[df_long["kode_wilayah"].notna()]
 
     df_long["nilai"] = pd.to_numeric(df_long["nilai"], errors="coerce")
@@ -45,19 +50,33 @@ def process_sheet(file_path, sheet_name):
         lambda x: pd.Series(parse_periode(x))
     )
 
-    df_long["kode"] = df_long["freq"] + "-STIK"
+    df_long["kode"] = df_long["freq"] + "STIK"
     df_long["deskripsi"] = "Alokasi APBN STIK MBG"
     df_long["satuan"] = "juta rupiah"
     df_long["konversi"] = "UM"
     df_long["created_at"] = datetime.now(timezone.utc)
 
     return df_long[
-        ["kode_wilayah", "rank_apbn", "tahun", "freq", "period", "nilai", "kode", "deskripsi", "satuan", "konversi", "created_at"]
+        [
+            "kode_wilayah",
+            "rank_apbn",
+            "tahun",
+            "freq",
+            "period",
+            "nilai",
+            "kode",
+            "deskripsi",
+            "satuan",
+            "konversi",
+            "created_at",
+        ]
     ]
 
 
 if __name__ == "__main__":
-    file_path = "data/indikator/regional/18 Alokasi APBN - stik mbg 2025q1 sd 2026q1.xlsx"
+    file_path = (
+        "data/indikator/regional/18 Alokasi APBN - stik mbg 2025q1 sd 2026q1.xlsx"
+    )
 
     # DATABASE_URL = os.getenv(
     #     "DATABASE_URL", "postgresql://dnpeng:dnpeng7240@localhost:5432/dnpeng_db"
@@ -67,16 +86,14 @@ if __name__ == "__main__":
     # cur = conn.cursor()
 
     try:
-        print("Truncate table alokasi_apbn...")
-        # cur.execute("TRUNCATE TABLE alokasi_apbn RESTART IDENTITY;")
-        # conn.commit()
+        print("Add table PKP: Alokasi APBN STIK...")
 
         sheets = [
             ("STIK",),
         ]
 
         # insert_query = """
-        # INSERT INTO alokasi_apbn
+        # INSERT INTO pkp
         # (kode_wilayah, rank_apbn, tahun, freq, period, nilai, kode, deskripsi, satuan, konversi, created_at)
         # VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
         # """
@@ -118,4 +135,3 @@ if __name__ == "__main__":
     # finally:
     #     cur.close()
     #     conn.close()
-

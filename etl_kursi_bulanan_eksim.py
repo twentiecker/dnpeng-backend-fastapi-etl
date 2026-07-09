@@ -49,11 +49,24 @@ def process_sheet(file_path, sheet_name):
     df_long["period"] = df_long["col_idx"].map(col_to_period)
     df_long["freq"] = "M"
 
-    df_long["kode"] = df_long["freq"] + "-" + df_long["deskripsi"].apply(lambda x: "".join([w[0].upper() for w in str(x).split() if w]))
+    df_long["kode"] = df_long["freq"] + df_long["deskripsi"].apply(
+        lambda x: "".join([w[0].upper() for w in str(x).split() if w])
+    )
     df_long["satuan"] = "rupiah"
     df_long["created_at"] = datetime.now(timezone.utc)
 
-    return df_long[["tahun", "freq", "period", "nilai", "kode", "deskripsi", "satuan", "created_at"]]
+    return df_long[
+        [
+            "tahun",
+            "freq",
+            "period",
+            "nilai",
+            "kode",
+            "deskripsi",
+            "satuan",
+            "created_at",
+        ]
+    ]
 
 
 if __name__ == "__main__":
@@ -115,4 +128,3 @@ if __name__ == "__main__":
     # finally:
     #     cur.close()
     #     conn.close()
-

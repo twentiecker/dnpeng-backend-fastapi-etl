@@ -10,7 +10,7 @@ def parse_periode(p):
         p = str(p)
 
     p = p.strip()
-    m = re.match(r'(\d{4})\s*Q([1-4])', p, re.IGNORECASE)
+    m = re.match(r"(\d{4})\s*Q([1-4])", p, re.IGNORECASE)
     if m:
         tahun = int(m.group(1))
         period = int(m.group(2))
@@ -24,7 +24,13 @@ def process_sheet(file_path, sheet_name):
 
     df = pd.read_excel(file_path, sheet_name=sheet_name, header=0)
 
-    id_vars = ["KdProv", "Kode Kabkota", "Status Penanaman Modal", "Tahap Konstruksi", "Jenis"]
+    id_vars = [
+        "KdProv",
+        "Kode Kabkota",
+        "Status Penanaman Modal",
+        "Tahap Konstruksi",
+        "Jenis",
+    ]
     period_cols = [c for c in df.columns if c not in id_vars]
 
     df_long = df.melt(
@@ -34,16 +40,21 @@ def process_sheet(file_path, sheet_name):
         value_name="nilai",
     )
 
-    df_long.rename(columns={
-        "KdProv": "kode_prov",
-        "Kode Kabkota": "kode_kako",
-        "Status Penanaman Modal": "status_modal",
-        "Tahap Konstruksi": "tahap",
-        "Jenis": "deskripsi",
-    }, inplace=True)
+    df_long.rename(
+        columns={
+            "KdProv": "kode_prov",
+            "Kode Kabkota": "kode_kako",
+            "Status Penanaman Modal": "status_modal",
+            "Tahap Konstruksi": "tahap",
+            "Jenis": "deskripsi",
+        },
+        inplace=True,
+    )
 
     df_long["kode_prov"] = df_long["kode_prov"].astype(str).str.extract(r"(\d+)")[0]
-    df_long["kode_kako"] = df_long["kode_kako"].astype(str).str.extract(r"(\d+)")[0].str.zfill(2)
+    df_long["kode_kako"] = (
+        df_long["kode_kako"].astype(str).str.extract(r"(\d+)")[0].str.zfill(2)
+    )
 
     df_long = df_long[df_long["kode_prov"].notna() & df_long["kode_kako"].notna()]
 
@@ -54,13 +65,39 @@ def process_sheet(file_path, sheet_name):
         lambda x: pd.Series(parse_periode(x))
     )
 
-    df_long["kode"] = df_long["freq"] + "-" + df_long["deskripsi"].apply(lambda x: "".join([w[0].upper() for w in str(x).replace("_", " ").replace("/", " ").replace("&", " ").split() if w]))
+    df_long["kode"] = df_long["freq"] + df_long["deskripsi"].apply(
+        lambda x: "".join(
+            [
+                w[0].upper()
+                for w in str(x)
+                .replace("_", " ")
+                .replace("/", " ")
+                .replace("&", " ")
+                .split()
+                if w
+            ]
+        )
+    )
     df_long["satuan"] = "triliun rupiah"
     df_long["konversi"] = "SUM"
     df_long["created_at"] = datetime.now(timezone.utc)
 
     return df_long[
-        ["kode_prov", "kode_kako", "status_modal", "tahap", "tahun", "freq", "period", "nilai", "kode", "deskripsi", "satuan", "konversi", "created_at"]
+        [
+            "kode_prov",
+            "kode_kako",
+            "status_modal",
+            "tahap",
+            "tahun",
+            "freq",
+            "period",
+            "nilai",
+            "kode",
+            "deskripsi",
+            "satuan",
+            "konversi",
+            "created_at",
+        ]
     ]
 
 
@@ -75,16 +112,14 @@ if __name__ == "__main__":
     # cur = conn.cursor()
 
     try:
-        print("Truncate table modal_tetap...")
-        # cur.execute("TRUNCATE TABLE modal_tetap RESTART IDENTITY;")
-        # conn.commit()
+        print("Add table PMTB: Modal Tetap...")
 
         sheets = [
             ("Breakdown",),
         ]
 
         # insert_query = """
-        # INSERT INTO modal_tetap
+        # INSERT INTO pmtb
         # (kode_prov, kode_kako, status_modal, tahap, jenis, tahun, freq, period, nilai, kode, deskripsi, satuan, konversi, created_at)
         # VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
         # """
@@ -129,4 +164,3 @@ if __name__ == "__main__":
     # finally:
     #     cur.close()
     #     conn.close()
-

@@ -7,33 +7,53 @@ from datetime import datetime
 # CONFIG ETL FILES
 # ===============================
 etl_files = [
-    "etl_pkrt.py",
-    "etl_pkp.py",
-    "etl_pmtb.py",
-    "etl_eksim.py",
-    "etl_pdb.py",
-    "etl_transaksi_regional.py",
-    "etl_wisnus_asal.py",
-    "etl_impor_barang_konsumsi.py",
-    "etl_realisasi_semen.py",
-    "etl_belanja_apbn.py",
-    "etl_wisnus_tujuan.py",
-    "etl_ekspor_hs2.py",
-    "etl_ekspor_hs2_raw.py",
-    "etl_pma_pmdn.py",
-    "etl_apbd.py",
+    # ===============================
+    # TABLE MASTER KPPBC
+    # ===============================
+    # "etl_master_kppbc.py",
+    # ===============================
+    # TABLE MASTER WILAYAH
+    # ===============================
     "etl_master_wilayah.py",
-    "etl_master_kppbc.py",
-    "etl_kursi_bulanan_eksim.py",
-    "etl_alokasi_apbn.py",
-    "etl_modal_tetap.py",
-    "etl_vol_impor_hs2.py",
-    "etl_vol_ekspor_hs2.py",
-    "etl_nilai_impor_hs2.py",
-    "etl_nilai_ekspor_hs2.py",
-    "etl_nilai_ekspor_hs2_raw.py",
-    "etl_impor_barang.py",
-    "etl_alokasi_apbn_stik.py",
+    # ===============================
+    # TABLE KURS BULANAN
+    # ===============================
+    # "etl_kursi_bulanan_eksim.py",
+    # ===============================
+    # TABLE PKRT
+    # ===============================
+    "etl_pkrt.py",
+    "etl_wisnus_asal.py",
+    "etl_wisnus_tujuan.py",
+    "etl_nilai_volume_transaksi.py",
+    # ===============================
+    # TABLE PMTB
+    # ===============================
+    "etl_pmtb.py",
+    "etl_realisasi_semen.py",
+    "etl_pma_pmdn.py",
+    # "etl_modal_tetap.py",
+    # ===============================
+    # TABLE PKP
+    # ===============================
+    "etl_pkp.py",
+    "etl_apbd.py",
+    "etl_belanja_apbn.py",
+    # "etl_alokasi_apbn_stik.py",
+    # ===============================
+    # TABLE EKSIM
+    # ===============================
+    "etl_eksim.py",
+    # "etl_impor_barang.py",
+    # "etl_vol_impor_hs2.py",
+    # "etl_vol_ekspor_hs2.py",
+    # "etl_nilai_impor_hs2.py",
+    # "etl_nilai_ekspor_hs2.py",
+    # "etl_nilai_ekspor_hs2_raw.py",
+    # ===============================
+    # TABLE PDB
+    # ===============================
+    "etl_pdb.py",
 ]
 
 # ===============================

@@ -56,6 +56,8 @@ def process_sheet(file_path, sheet_name):
 
     df_long["created_at"] = datetime.now(timezone.utc)
 
+    df_long["kode_wilayah"] = "00"
+
     return df_long
 
 
@@ -75,9 +77,9 @@ try:
     # =========================
     # 1. Truncate table + reset id
     # =========================
-    print("Truncate table pdb...")
-    cur.execute("TRUNCATE TABLE pdb RESTART IDENTITY;")
-    conn.commit()
+    print("Add table PDB...")
+    # cur.execute("TRUNCATE TABLE pdb RESTART IDENTITY;")
+    # conn.commit()
 
     # =========================
     # 2. Proses semua sheet otomatis
@@ -86,8 +88,8 @@ try:
 
     insert_query = """
     INSERT INTO pdb
-    (kode, deskripsi, satuan, jenis, tahun, freq, period, nilai, created_at)
-    VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)
+    (kode, deskripsi, satuan, jenis, tahun, freq, period, nilai, created_at, kode_wilayah)
+    VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
     """
 
     total_rows = 0
@@ -108,12 +110,14 @@ try:
                     row["period"],
                     row["nilai"],
                     row["created_at"],
+                    row["kode_wilayah"],
                 ),
             )
 
         total_rows += len(df_long)
         conn.commit()
         print(f"{sheet} selesai ({len(df_long)} rows)")
+        print(df_long)
 
     print(f"\nSemua data berhasil dimasukkan ({total_rows} rows)")
 

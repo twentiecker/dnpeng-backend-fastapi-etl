@@ -56,6 +56,8 @@ def process_sheet(file_path, sheet_name):
 
     df_long["created_at"] = datetime.now(timezone.utc)
 
+    df_long["kode_wilayah"] = "00"
+
     return df_long
 
 
@@ -73,11 +75,11 @@ cur = conn.cursor()
 
 try:
     # =========================
-    # 1. Truncate table + reset id
+    # 1. Add table + reset id
     # =========================
-    print("Truncate table eksim...")
-    cur.execute("TRUNCATE TABLE eksim RESTART IDENTITY;")
-    conn.commit()
+    print("Add table EKSIM...")
+    # cur.execute("TRUNCATE TABLE eksim RESTART IDENTITY;")
+    # conn.commit()
 
     # =========================
     # 2. Proses semua sheet otomatis
@@ -86,8 +88,8 @@ try:
 
     insert_query = """
     INSERT INTO eksim
-    (kode, deskripsi, tahun, freq, period, nilai, created_at, satuan, konversi)
-    VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)
+    (kode, deskripsi, tahun, freq, period, nilai, created_at, satuan, konversi, kode_wilayah)
+    VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
     """
 
     total_rows = 0
@@ -108,12 +110,14 @@ try:
                     row["created_at"],
                     row["satuan"],
                     row["konversi"],
+                    row["kode_wilayah"],
                 ),
             )
 
         total_rows += len(df_long)
         conn.commit()
         print(f"{sheet} selesai ({len(df_long)} rows)")
+        print(df_long)
 
     print(f"\nSemua data berhasil dimasukkan ({total_rows} rows)")
 

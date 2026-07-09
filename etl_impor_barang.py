@@ -49,7 +49,9 @@ def process_sheet(file_path, sheet_name, deskripsi_prefix):
     df_data.columns = header_row
     df_data = df_data.reset_index(drop=True)
 
-    period_cols = [c for c in df_data.columns if c not in ["Provinsi", "Kategori BEC", "Kode BEC"]]
+    period_cols = [
+        c for c in df_data.columns if c not in ["Provinsi", "Kategori BEC", "Kode BEC"]
+    ]
 
     period_info = []
     current_tahun = None
@@ -71,7 +73,9 @@ def process_sheet(file_path, sheet_name, deskripsi_prefix):
 
     df_long.rename(columns={"Provinsi": "kode_wilayah"}, inplace=True)
 
-    df_long["kode_wilayah"] = df_long["kode_wilayah"].astype(str).str.extract(r"(\d+)")[0]
+    df_long["kode_wilayah"] = (
+        df_long["kode_wilayah"].astype(str).str.extract(r"(\d+)")[0]
+    )
 
     tahun_list = [y for _, y in period_info]
     df_long["tahun"] = tahun_list * len(df_data)
@@ -85,13 +89,24 @@ def process_sheet(file_path, sheet_name, deskripsi_prefix):
     )
 
     df_long["deskripsi"] = deskripsi_prefix + " " + df_long["Kategori BEC"].astype(str)
-    df_long["kode"] = "M-" + df_long["Kode BEC"].astype(str)
+    df_long["kode"] = "M" + df_long["Kode BEC"].astype(str)
     df_long["satuan"] = "USD"
     df_long["konversi"] = "SUM"
     df_long["created_at"] = datetime.now(timezone.utc)
 
     return df_long[
-        ["kode_wilayah", "tahun", "freq", "period", "nilai", "kode", "deskripsi", "satuan", "konversi", "created_at"]
+        [
+            "kode_wilayah",
+            "tahun",
+            "freq",
+            "period",
+            "nilai",
+            "kode",
+            "deskripsi",
+            "satuan",
+            "konversi",
+            "created_at",
+        ]
     ]
 
 
@@ -106,16 +121,14 @@ if __name__ == "__main__":
     # cur = conn.cursor()
 
     try:
-        print("Truncate table transaksi_regional...")
-        # cur.execute("TRUNCATE TABLE transaksi_regional RESTART IDENTITY;")
-        # conn.commit()
+        print("Add table EKSIM: Impor Barang...")
 
         sheets = [
             ("bec_bulanan_2025_mar2026s nilai", "Impor Barang"),
         ]
 
         # insert_query = """
-        # INSERT INTO transaksi_regional
+        # INSERT INTO eksim
         # (kode_wilayah, tahun, freq, period, nilai, kode, deskripsi, satuan, konversi, created_at)
         # VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
         # """
@@ -156,4 +169,3 @@ if __name__ == "__main__":
     # finally:
     #     cur.close()
     #     conn.close()
-

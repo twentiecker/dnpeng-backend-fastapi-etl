@@ -26,9 +26,9 @@ def parse_periode(p):
 
     p = str(p).strip()
 
-    q_match = re.match(r'Q([1-4])', p, re.IGNORECASE)
+    q_match = re.match(r"Q([1-4])", p, re.IGNORECASE)
     if q_match:
-        nums = re.findall(r'\d+', p)
+        nums = re.findall(r"\d+", p)
         if nums:
             tahun = int(nums[0])
             if tahun < 100:
@@ -64,7 +64,9 @@ def process_sheet(file_path, sheet_name, deskripsi):
 
     df_long.rename(columns={"Provinsi": "kode_wilayah"}, inplace=True)
 
-    df_long["kode_wilayah"] = df_long["kode_wilayah"].astype(str).str.extract(r"(\d+)")[0]
+    df_long["kode_wilayah"] = (
+        df_long["kode_wilayah"].astype(str).str.extract(r"(\d+)")[0]
+    )
 
     df_long["nilai"] = df_long["nilai"].astype(str).str.replace(",", "", regex=False)
     df_long["nilai"] = pd.to_numeric(df_long["nilai"], errors="coerce")
@@ -74,7 +76,7 @@ def process_sheet(file_path, sheet_name, deskripsi):
         lambda x: pd.Series(parse_periode(x))
     )
 
-    df_long["kode"] = df_long["freq"] + "-" + sheet_name
+    df_long["kode"] = df_long["freq"] + sheet_name
     df_long["deskripsi"] = deskripsi
 
     def get_satuan(d):
@@ -90,24 +92,33 @@ def process_sheet(file_path, sheet_name, deskripsi):
     df_long["created_at"] = datetime.now(timezone.utc)
 
     return df_long[
-        ["kode_wilayah", "tahun", "freq", "period", "nilai", "kode", "deskripsi", "satuan", "konversi", "created_at"]
+        [
+            "kode_wilayah",
+            "tahun",
+            "freq",
+            "period",
+            "nilai",
+            "kode",
+            "deskripsi",
+            "satuan",
+            "konversi",
+            "created_at",
+        ]
     ]
 
 
 if __name__ == "__main__":
     file_path = "data/indikator/regional/1-6 Nilai dan volume transaksi kredit debit emoney 2024Q1 - 2026Q1.xlsx"
 
-    # DATABASE_URL = os.getenv(
-    #     "DATABASE_URL", "postgresql://dnpeng:dnpeng7240@localhost:5432/dnpeng_db"
-    # )
+    DATABASE_URL = os.getenv(
+        "DATABASE_URL", "postgresql://dnpeng:dnpeng7240@localhost:5432/dnpeng_db"
+    )
 
-    # conn = psycopg2.connect(DATABASE_URL)
-    # cur = conn.cursor()
+    conn = psycopg2.connect(DATABASE_URL)
+    cur = conn.cursor()
 
     try:
-        print("Truncate table transaksi_regional...")
-        # cur.execute("TRUNCATE TABLE transaksi_regional RESTART IDENTITY;")
-        # conn.commit()
+        print("Add table PKRT: Kartu Kredit, Kartu Debit, e-Money...")
 
         sheets = [
             ("VKK", "Volume Kartu Kredit"),
@@ -118,46 +129,61 @@ if __name__ == "__main__":
             ("NUE", "Nilai Uang Elektronik"),
         ]
 
-        # insert_query = """
-        # INSERT INTO transaksi_regional
-        # (kode_wilayah, tahun, freq, period, nilai, kode, deskripsi, satuan, konversi, created_at)
-        # VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
-        # """
+        insert_query = """
+        INSERT INTO pkrt
+        (kode_wilayah, tahun, freq, period, nilai, kode, deskripsi, satuan, konversi, created_at)
+        VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+        """
 
         total_rows = 0
 
         for sheet_name, deskripsi in sheets:
             df_long = process_sheet(file_path, sheet_name, deskripsi)
 
-            # for _, row in df_long.iterrows():
-                # cur.execute(
-                #     insert_query,
-                #     (
-                #         row["kode_wilayah"],
-                #         int(row["tahun"]),
-                #         row["freq"],
-                #         int(row["period"]),
-                #         row["nilai"],
-                #         row["kode"],
-                #         row["deskripsi"],
-                #         row["satuan"],
-                #         row["konversi"],
-                #         row["created_at"],
-                #     ),
-                # )
+            # dup = df_long[
+            #     df_long.duplicated(
+            #         subset=[
+            #             "kode_wilayah",
+            #             "kode",
+            #             "tahun",
+            #             "freq",
+            #             "period",
+            #         ],
+            #         keep=False,
+            #     )
+            # ]
+
+            # print("ini file yang duplikasi")
+            # print(dup)
+
+            for _, row in df_long.iterrows():
+                cur.execute(
+                    insert_query,
+                    (
+                        row["kode_wilayah"],
+                        int(row["tahun"]),
+                        row["freq"],
+                        int(row["period"]),
+                        row["nilai"],
+                        row["kode"],
+                        row["deskripsi"],
+                        row["satuan"],
+                        row["konversi"],
+                        row["created_at"],
+                    ),
+                )
 
             total_rows += len(df_long)
-            # conn.commit()
+            conn.commit()
             print(f"{sheet_name} selesai ({len(df_long)} rows)")
             print(df_long)
 
         print(f"\nSemua data berhasil dimasukkan ({total_rows} rows)")
 
     except Exception as e:
-        # conn.rollback()
+        conn.rollback()
         print("ERROR:", e)
 
-    # finally:
-        # cur.close()
-        # conn.close()
-
+    finally:
+        cur.close()
+        conn.close()
