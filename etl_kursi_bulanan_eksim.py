@@ -52,7 +52,7 @@ def process_sheet(file_path, sheet_name):
     df_long["kode"] = df_long["freq"] + df_long["deskripsi"].apply(
         lambda x: "".join([w[0].upper() for w in str(x).split() if w])
     )
-    df_long["satuan"] = "rupiah"
+    df_long["satuan"] = "Rupiah"
     df_long["created_at"] = datetime.now(timezone.utc)
 
     return df_long[

@@ -2,6 +2,7 @@ import pandas as pd
 import psycopg2
 from datetime import datetime, timezone
 import os
+import re
 
 
 # =========================
@@ -15,6 +16,16 @@ def parse_periode(p):
     period = int(p[5:])
 
     return tahun, freq, period
+
+
+# =========================
+# Helper: bersihkan teks deskripsi komponen
+#   - hapus kode di awal kalimat (1., a., a.1., dst)
+# =========================
+def clean_deskripsi(desc):
+    d = str(desc).strip()
+    d = re.sub(r"^\s*[\d.a-z]+\.\s*", "", d)
+    return d.strip()
 
 
 # =========================
@@ -43,6 +54,9 @@ def process_sheet(file_path, sheet_name):
         inplace=True,
     )
 
+    # Bersihkan deskripsi (hapus kode di awal kalimat)
+    df_long["deskripsi"] = df_long["deskripsi"].apply(clean_deskripsi)
+
     # Bersihkan nilai
     df_long["nilai"] = df_long["nilai"].astype(str).str.replace(",", "", regex=False)
 
@@ -58,20 +72,22 @@ def process_sheet(file_path, sheet_name):
 
     df_long["kode_wilayah"] = "00"
 
+    df_long["konversi"] = "SUM"
+
     return df_long
 
 
 # =========================
 # Main ETL
 # =========================
-file_path = "pdb_final_input.xlsx"
+file_path = "data/pdb_final_input.xlsx"
 
-DATABASE_URL = os.getenv(
-    "DATABASE_URL", "postgresql://dnpeng:dnpeng7240@localhost:5432/dnpeng_db"
-)
+# DATABASE_URL = os.getenv(
+#     "DATABASE_URL", "postgresql://dnpeng:dnpeng7240@localhost:5432/dnpeng_db"
+# )
 
-conn = psycopg2.connect(DATABASE_URL)
-cur = conn.cursor()
+# conn = psycopg2.connect(DATABASE_URL)
+# cur = conn.cursor()
 
 try:
     # =========================
@@ -86,45 +102,46 @@ try:
     # =========================
     all_sheets = ["ADHB", "ADHK"]
 
-    insert_query = """
-    INSERT INTO pdb
-    (kode, deskripsi, satuan, jenis, tahun, freq, period, nilai, created_at, kode_wilayah)
-    VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
-    """
+    # insert_query = """
+    # INSERT INTO pdb
+    # (kode, deskripsi, satuan, jenis, konversi, tahun, freq, period, nilai, created_at, kode_wilayah)
+    # VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+    # """
 
     total_rows = 0
 
     for sheet in all_sheets:
         df_long = process_sheet(file_path, sheet)
 
-        for _, row in df_long.iterrows():
-            cur.execute(
-                insert_query,
-                (
-                    row["kode"],
-                    row["deskripsi"],
-                    row["satuan"],
-                    row["jenis"],
-                    row["tahun"],
-                    row["freq"],
-                    row["period"],
-                    row["nilai"],
-                    row["created_at"],
-                    row["kode_wilayah"],
-                ),
-            )
+        # for _, row in df_long.iterrows():
+        #     cur.execute(
+        #         insert_query,
+        #         (
+        #             row["kode"],
+        #             row["deskripsi"],
+        #             row["satuan"],
+        #             row["jenis"],
+        #             row["konversi"],
+        #             row["tahun"],
+        #             row["freq"],
+        #             row["period"],
+        #             row["nilai"],
+        #             row["created_at"],
+        #             row["kode_wilayah"],
+        #         ),
+        #     )
 
         total_rows += len(df_long)
-        conn.commit()
+        # conn.commit()
         print(f"{sheet} selesai ({len(df_long)} rows)")
         print(df_long)
 
     print(f"\nSemua data berhasil dimasukkan ({total_rows} rows)")
 
 except Exception as e:
-    conn.rollback()
+    # conn.rollback()
     print("ERROR:", e)
 
-finally:
-    cur.close()
-    conn.close()
+# finally:
+#     cur.close()
+#     conn.close()

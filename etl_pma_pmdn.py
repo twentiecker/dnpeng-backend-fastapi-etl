@@ -92,7 +92,7 @@ def process_sheet(file_path, sheet_name, deskripsi_prefix):
 
     df_long["kode"] = "Q" + sheet_name
     df_long["deskripsi"] = deskripsi_prefix
-    df_long["satuan"] = "juta rupiah"
+    df_long["satuan"] = "Juta Rupiah"
     df_long["konversi"] = "SUM"
     df_long["created_at"] = datetime.now(timezone.utc)
 

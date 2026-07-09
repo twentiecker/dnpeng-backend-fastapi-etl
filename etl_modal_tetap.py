@@ -78,7 +78,7 @@ def process_sheet(file_path, sheet_name):
             ]
         )
     )
-    df_long["satuan"] = "triliun rupiah"
+    df_long["satuan"] = "Triliun Rupiah"
     df_long["konversi"] = "SUM"
     df_long["created_at"] = datetime.now(timezone.utc)
 

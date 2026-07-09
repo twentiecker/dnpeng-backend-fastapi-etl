@@ -92,7 +92,7 @@ def process_sheet(file_path, sheet_name):
     df_long["deskripsi"] = df_long["col_idx"].map(lambda x: col_to_info[x]["deskripsi"])
 
     df_long["kode"] = df_long["freq"] + df_long["deskripsi"].map(DESKRIPSI_MAP)
-    df_long["satuan"] = "rupiah"
+    df_long["satuan"] = "Rupiah"
     df_long["konversi"] = "SUM"
     df_long["created_at"] = datetime.now(timezone.utc)
 

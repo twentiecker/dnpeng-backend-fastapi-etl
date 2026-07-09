@@ -82,9 +82,9 @@ def process_sheet(file_path, sheet_name, deskripsi):
     def get_satuan(d):
         dl = str(d).lower()
         if "volume" in dl:
-            return "frekuensi"
+            return "Frekuensi"
         if "nilai" in dl:
-            return "juta rupiah"
+            return "Juta Rupiah"
         return "transaksi"
 
     df_long["satuan"] = df_long["deskripsi"].apply(get_satuan)

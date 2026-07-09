@@ -71,7 +71,7 @@ def process_sheet(file_path, sheet_name, deskripsi_prefix):
 
     df_melt["deskripsi"] = deskripsi_prefix
     df_melt["kode"] = "Q" + sheet_name
-    df_melt["satuan"] = "juta rupiah"
+    df_melt["satuan"] = "Juta Rupiah"
     df_melt["konversi"] = "SUM"
     df_melt["created_at"] = datetime.now(timezone.utc)
 

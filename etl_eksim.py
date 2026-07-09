@@ -64,7 +64,7 @@ def process_sheet(file_path, sheet_name):
 # =========================
 # Main ETL
 # =========================
-file_path = "eksim_final_input.xlsx"
+file_path = "data/indikator/eksim_final_input.xlsx"
 
 DATABASE_URL = os.getenv(
     "DATABASE_URL", "postgresql://dnpeng:dnpeng7240@localhost:5432/dnpeng_db"
