@@ -14,6 +14,12 @@ DESKRIPSI_MAP = {
     "Belanja Tak Terduga": "BT",
 }
 
+# Kanonisasi deskripsi agar varian penulisan yang sama tidak muncul
+# sebagai dua nama berbeda (mis. "Belanja Tidak Terduga" / "Belanja Tak Terduga")
+DESKRIPSI_CANON = {
+    "Belanja Tak Terduga": "Belanja Tidak Terduga",
+}
+
 
 def parse_periode(p):
     if not isinstance(p, str):
@@ -90,6 +96,7 @@ def process_sheet(file_path, sheet_name):
     df_long["freq"] = df_long["col_idx"].map(lambda x: col_to_info[x]["freq"])
     df_long["period"] = df_long["col_idx"].map(lambda x: col_to_info[x]["period"])
     df_long["deskripsi"] = df_long["col_idx"].map(lambda x: col_to_info[x]["deskripsi"])
+    df_long["deskripsi"] = df_long["deskripsi"].str.strip().replace(DESKRIPSI_CANON)
 
     df_long["kode"] = df_long["freq"] + df_long["deskripsi"].map(DESKRIPSI_MAP)
     df_long["satuan"] = "Rupiah"
@@ -115,12 +122,12 @@ def process_sheet(file_path, sheet_name):
 if __name__ == "__main__":
     file_path = "data/indikator/regional/19-23 Data APBD (Sitralis 2022-2026).xlsx"
 
-    DATABASE_URL = os.getenv(
-        "DATABASE_URL", "postgresql://dnpeng:dnpeng7240@localhost:5432/dnpeng_db"
-    )
+    # DATABASE_URL = os.getenv(
+    #     "DATABASE_URL", "postgresql://dnpeng:dnpeng7240@localhost:5432/dnpeng_db"
+    # )
 
-    conn = psycopg2.connect(DATABASE_URL)
-    cur = conn.cursor()
+    # conn = psycopg2.connect(DATABASE_URL)
+    # cur = conn.cursor()
 
     try:
         print("Add table PKP: APBD...")
@@ -129,45 +136,45 @@ if __name__ == "__main__":
             ("Rekap APBD Total Triwulanan",),
         ]
 
-        insert_query = """
-        INSERT INTO pkp
-        (kode_wilayah, tahun, freq, period, nilai, kode, deskripsi, satuan, konversi, created_at)
-        VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
-        """
+        # insert_query = """
+        # INSERT INTO pkp
+        # (kode_wilayah, tahun, freq, period, nilai, kode, deskripsi, satuan, konversi, created_at)
+        # VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+        # """
 
         total_rows = 0
 
         for sheet_name in sheets:
             df_long = process_sheet(file_path, sheet_name[0])
 
-            for _, row in df_long.iterrows():
-                cur.execute(
-                    insert_query,
-                    (
-                        row["kode_wilayah"],
-                        int(row["tahun"]),
-                        row["freq"],
-                        int(row["period"]),
-                        row["nilai"],
-                        row["kode"],
-                        row["deskripsi"],
-                        row["satuan"],
-                        row["konversi"],
-                        row["created_at"],
-                    ),
-                )
+            # for _, row in df_long.iterrows():
+            #     cur.execute(
+            #         insert_query,
+            #         (
+            #             row["kode_wilayah"],
+            #             int(row["tahun"]),
+            #             row["freq"],
+            #             int(row["period"]),
+            #             row["nilai"],
+            #             row["kode"],
+            #             row["deskripsi"],
+            #             row["satuan"],
+            #             row["konversi"],
+            #             row["created_at"],
+            #         ),
+            #     )
 
             total_rows += len(df_long)
-            conn.commit()
+            # conn.commit()
             print(f"{sheet_name[0]} selesai ({len(df_long)} rows)")
             print(df_long)
 
         print(f"\nSemua data berhasil dimasukkan ({total_rows} rows)")
 
     except Exception as e:
-        conn.rollback()
+        # conn.rollback()
         print("ERROR:", e)
 
-    finally:
-        cur.close()
-        conn.close()
+    # finally:
+    #     cur.close()
+    #     conn.close()
