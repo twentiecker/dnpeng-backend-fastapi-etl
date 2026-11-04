@@ -2,6 +2,14 @@
 import psycopg2
 from datetime import datetime, timezone
 import os
+from dotenv import load_dotenv
+from pathlib import Path
+
+BASE_DIR = Path(__file__).resolve().parent
+
+# Kalau .env ada, load.
+# Kalau tidak ada, tidak masalah.
+load_dotenv(BASE_DIR / ".env")
 
 
 def process_sheet(file_path, sheet_name):
@@ -9,18 +17,21 @@ def process_sheet(file_path, sheet_name):
 
     df = pd.read_excel(file_path, sheet_name=sheet_name, header=0)
 
-    df_grouped = df.groupby(
-        ["ORIG2", "K", "HS2", "YEAR", "MTH"], as_index=False
-    )["FOB"].sum()
+    df_grouped = df.groupby(["ORIG2", "K", "HS2", "YEAR", "MTH"], as_index=False)[
+        "FOB"
+    ].sum()
 
-    df_grouped.rename(columns={
-        "ORIG2": "provinsi",
-        "K": "jenis",
-        "HS2": "kode_hs",
-        "YEAR": "tahun",
-        "MTH": "period",
-        "FOB": "nilai",
-    }, inplace=True)
+    df_grouped.rename(
+        columns={
+            "ORIG2": "provinsi",
+            "K": "jenis",
+            "HS2": "kode_hs",
+            "YEAR": "tahun",
+            "MTH": "period",
+            "FOB": "nilai",
+        },
+        inplace=True,
+    )
 
     df_grouped["provinsi"] = df_grouped["provinsi"].astype(str)
     df_grouped["jenis"] = df_grouped["jenis"].astype(str)
@@ -35,7 +46,18 @@ def process_sheet(file_path, sheet_name):
     df_grouped["created_at"] = datetime.now(timezone.utc)
 
     return df_grouped[
-        ["provinsi", "jenis", "kode_hs", "tahun", "freq", "period", "nilai", "satuan", "konversi", "created_at"]
+        [
+            "provinsi",
+            "jenis",
+            "kode_hs",
+            "tahun",
+            "freq",
+            "period",
+            "nilai",
+            "satuan",
+            "konversi",
+            "created_at",
+        ]
     ]
 
 
@@ -100,4 +122,3 @@ if __name__ == "__main__":
     # finally:
     #     cur.close()
     #     conn.close()
-

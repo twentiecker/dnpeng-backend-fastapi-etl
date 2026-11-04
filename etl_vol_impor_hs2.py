@@ -2,6 +2,14 @@
 import psycopg2
 from datetime import datetime, timezone
 import os
+from dotenv import load_dotenv
+from pathlib import Path
+
+BASE_DIR = Path(__file__).resolve().parent
+
+# Kalau .env ada, load.
+# Kalau tidak ada, tidak masalah.
+load_dotenv(BASE_DIR / ".env")
 
 
 def process_sheet(file_path, sheet_name):
@@ -19,11 +27,14 @@ def process_sheet(file_path, sheet_name):
         value_name="nilai",
     )
 
-    df_long.rename(columns={
-        "Provinsi": "provinsi",
-        "Jenis": "jenis",
-        "HS": "kode_hs",
-    }, inplace=True)
+    df_long.rename(
+        columns={
+            "Provinsi": "provinsi",
+            "Jenis": "jenis",
+            "HS": "kode_hs",
+        },
+        inplace=True,
+    )
 
     df_long["provinsi"] = df_long["provinsi"].astype(str)
     df_long["jenis"] = df_long["jenis"].astype(str)
@@ -42,7 +53,18 @@ def process_sheet(file_path, sheet_name):
     df_long["created_at"] = datetime.now(timezone.utc)
 
     return df_long[
-        ["provinsi", "jenis", "kode_hs", "tahun", "freq", "period", "nilai", "satuan", "konversi", "created_at"]
+        [
+            "provinsi",
+            "jenis",
+            "kode_hs",
+            "tahun",
+            "freq",
+            "period",
+            "nilai",
+            "satuan",
+            "konversi",
+            "created_at",
+        ]
     ]
 
 
@@ -107,4 +129,3 @@ if __name__ == "__main__":
     # finally:
     #     cur.close()
     #     conn.close()
-

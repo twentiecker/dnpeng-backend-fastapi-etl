@@ -2,6 +2,14 @@
 import psycopg2
 from datetime import datetime, timezone
 import os
+from dotenv import load_dotenv
+from pathlib import Path
+
+BASE_DIR = Path(__file__).resolve().parent
+
+# Kalau .env ada, load.
+# Kalau tidak ada, tidak masalah.
+load_dotenv(BASE_DIR / ".env")
 
 
 def process_sheet(file_path, sheet_name):
@@ -9,17 +17,22 @@ def process_sheet(file_path, sheet_name):
 
     df = pd.read_excel(file_path, sheet_name=sheet_name, header=0)
 
-    df.rename(columns={
-        "prov_kppbc": "kode_prov",
-        "kppbc": "kode_kppbc",
-        "nama_kppbc": "nama_kppbc",
-        "kod_kab": "kode_kako",
-    }, inplace=True)
+    df.rename(
+        columns={
+            "prov_kppbc": "kode_prov",
+            "kppbc": "kode_kppbc",
+            "nama_kppbc": "nama_kppbc",
+            "kod_kab": "kode_kako",
+        },
+        inplace=True,
+    )
 
     df["kode_prov"] = df["kode_prov"].astype(str).str.strip()
     df["kode_kppbc"] = df["kode_kppbc"].astype(str).str.strip()
     df["nama_kppbc"] = df["nama_kppbc"].astype(str).str.strip()
-    df["kode_kako"] = df["kode_kako"].apply(lambda x: str(int(x)) if pd.notna(x) else None)
+    df["kode_kako"] = df["kode_kako"].apply(
+        lambda x: str(int(x)) if pd.notna(x) else None
+    )
 
     df["created_at"] = datetime.now(timezone.utc)
 
@@ -82,4 +95,3 @@ if __name__ == "__main__":
     # finally:
     #     cur.close()
     #     conn.close()
-

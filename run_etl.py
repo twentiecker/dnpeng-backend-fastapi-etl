@@ -10,7 +10,7 @@ etl_files = [
     # ===============================
     # TABLE MASTER KPPBC
     # ===============================
-    # "etl_master_kppbc.py",
+    # "etl_master_kppbc.py", # jangan dulu
     # ===============================
     # TABLE MASTER WILAYAH
     # ===============================
@@ -18,7 +18,7 @@ etl_files = [
     # ===============================
     # TABLE KURS BULANAN
     # ===============================
-    # "etl_kursi_bulanan_eksim.py",
+    # "etl_kursi_bulanan_eksim.py", # jangan dulu
     # ===============================
     # TABLE PKRT
     # ===============================
@@ -32,28 +32,31 @@ etl_files = [
     "etl_pmtb.py",
     "etl_realisasi_semen.py",
     "etl_pma_pmdn.py",
-    # "etl_modal_tetap.py",
+    # "etl_modal_tetap.py", # jangan dulu
     # ===============================
     # TABLE PKP
     # ===============================
     "etl_pkp.py",
     "etl_apbd.py",
     "etl_belanja_apbn.py",
-    # "etl_alokasi_apbn_stik.py",
+    # "etl_alokasi_apbn_stik.py", # jangan dulu
     # ===============================
     # TABLE EKSIM
     # ===============================
     "etl_eksim.py",
-    # "etl_impor_barang.py",
-    # "etl_vol_impor_hs2.py",
-    # "etl_vol_ekspor_hs2.py",
-    # "etl_nilai_impor_hs2.py",
-    # "etl_nilai_ekspor_hs2.py",
-    # "etl_nilai_ekspor_hs2_raw.py",
+    # "etl_impor_barang.py", # jangan dulu
+    # "etl_vol_impor_hs2.py", # jangan dulu
+    # "etl_vol_ekspor_hs2.py", # jangan dulu
+    # "etl_nilai_impor_hs2.py", # jangan dulu
+    # "etl_nilai_ekspor_hs2.py", # jangan dulu
+    # "etl_nilai_ekspor_hs2_raw.py", # jangan dulu
     # ===============================
     # TABLE PDB
     # ===============================
-    "etl_pdb.py",
+    # "etl_pdb.py", # jangan dulu
+    "etl_pdb_adhb.py",
+    "etl_pdb_adhk.py",
+    "etl_pdrb.py",
 ]
 
 # ===============================

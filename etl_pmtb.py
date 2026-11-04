@@ -2,6 +2,14 @@ import pandas as pd
 import psycopg2
 from datetime import datetime, timezone
 import os
+from dotenv import load_dotenv
+from pathlib import Path
+
+BASE_DIR = Path(__file__).resolve().parent
+
+# Kalau .env ada, load.
+# Kalau tidak ada, tidak masalah.
+load_dotenv(BASE_DIR / ".env")
 
 
 # =========================

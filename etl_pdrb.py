@@ -4,7 +4,6 @@ from datetime import datetime, timezone
 import os
 import re
 
-
 # =========================
 # Workaround: beberapa file xlsx (mis. PDRB) punya elemen <fill> yang
 # punya atribut tambahan sehingga openpyxl gagal parse
@@ -14,6 +13,15 @@ import re
 import openpyxl.styles.fills as _ob_fills
 
 _orig_fill_init = _ob_fills.Fill.__init__
+
+from dotenv import load_dotenv
+from pathlib import Path
+
+BASE_DIR = Path(__file__).resolve().parent
+
+# Kalau .env ada, load.
+# Kalau tidak ada, tidak masalah.
+load_dotenv(BASE_DIR / ".env")
 
 
 def _safe_fill_init(self, *args, **kwargs):
@@ -154,10 +162,15 @@ def process_block(df, start, end, jenis, kode_wilayah):
 
         for c in period_cols:
             label = period_labels[c]
-            if pd.isna(r[c]) or str(r[c]).strip() == "":
-                continue
+            # if pd.isna(r[c]) or str(r[c]).strip() == "":
+            #     continue
+
+            # nilai = pd.to_numeric(str(r[c]).replace(",", ""), errors="coerce")
+            # if pd.isna(nilai):
+            #     nilai = 0
 
             nilai = pd.to_numeric(str(r[c]).replace(",", ""), errors="coerce")
+
             if pd.isna(nilai):
                 nilai = 0
 
@@ -215,18 +228,18 @@ def process_sheet(df, sheet_name, kode_wilayah):
 if __name__ == "__main__":
     file_path = "data/PDRB Provinsi.xlsx"
 
-    # DATABASE_URL = os.getenv(
-    #     "DATABASE_URL", "postgresql://dnpeng:dnpeng7240@localhost:5432/dnpeng_db"
-    # )
+    DATABASE_URL = os.getenv(
+        "DATABASE_URL", "postgresql://dnpeng:dnpeng7240@localhost:5432/dnpeng_db"
+    )
 
-    # conn = psycopg2.connect(DATABASE_URL)
-    # cur = conn.cursor()
+    conn = psycopg2.connect(DATABASE_URL)
+    cur = conn.cursor()
 
     try:
         # =========================
         # 1. Truncate table + reset id
         # =========================
-        print("Add table PDRB...")
+        print("Add table PDB: PDRB ADHB dan ADHK...")
         # cur.execute("TRUNCATE TABLE pdrb RESTART IDENTITY;")
         # conn.commit()
 
@@ -234,11 +247,11 @@ if __name__ == "__main__":
         # 2. Proses semua sheet provinsi otomatis
         # =========================
         xls = pd.read_excel(file_path, sheet_name=None, header=None)
-        # insert_query = """
-        # INSERT INTO pdrb
-        # (kode, deskripsi, satuan, jenis, konversi, tahun, freq, period, nilai, created_at, kode_wilayah)
-        # VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
-        # """
+        insert_query = """
+        INSERT INTO pdb
+        (kode, deskripsi, satuan, jenis, konversi, tahun, freq, period, nilai, created_at, kode_wilayah)
+        VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+        """
 
         total_rows = 0
 
@@ -253,35 +266,35 @@ if __name__ == "__main__":
             if df_long.empty:
                 continue
 
-            # for _, row in df_long.iterrows():
-            #     cur.execute(
-            #         insert_query,
-            #         (
-            #             row["kode"],
-            #             row["deskripsi"],
-            #             row["satuan"],
-            #             row["jenis"],
-            #             row["konversi"],
-            #             int(row["tahun"]),
-            #             row["freq"],
-            #             int(row["period"]),
-            #             row["nilai"],
-            #             row["created_at"],
-            #             row["kode_wilayah"],
-            #         ),
-            #     )
+            for _, row in df_long.iterrows():
+                cur.execute(
+                    insert_query,
+                    (
+                        row["kode"],
+                        row["deskripsi"],
+                        row["satuan"],
+                        row["jenis"],
+                        row["konversi"],
+                        int(row["tahun"]),
+                        row["freq"],
+                        int(row["period"]),
+                        row["nilai"],
+                        row["created_at"],
+                        row["kode_wilayah"],
+                    ),
+                )
 
             total_rows += len(df_long)
-            # conn.commit()
+            conn.commit()
             print(f"{sheet_name} selesai ({len(df_long)} rows)")
             print(df_long)
 
         print(f"\nSemua data berhasil dimasukkan ({total_rows} rows)")
 
     except Exception as e:
-        # conn.rollback()
+        conn.rollback()
         print("ERROR:", e)
 
-    # finally:
-    #     cur.close()
-    #     conn.close()
+    finally:
+        cur.close()
+        conn.close()
