@@ -124,7 +124,7 @@ if __name__ == "__main__":
     file_path = "data/indikator/regional/24-26 Realisasi PMA PDMN BKPM 2010-2026.xlsx"
 
     DATABASE_URL = os.getenv(
-        "DATABASE_URL", "postgresql://dnpeng:dnpeng7240@localhost:5432/dnpeng_db"
+        "DATABASE_URL", "postgresql://postgres:rayy19@localhost:5432/dnpeng_db"
     )
 
     conn = psycopg2.connect(DATABASE_URL)

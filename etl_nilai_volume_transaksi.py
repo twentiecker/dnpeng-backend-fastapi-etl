@@ -119,7 +119,7 @@ if __name__ == "__main__":
     file_path = "data/indikator/regional/1-6 Nilai dan volume transaksi kredit debit emoney 2024Q1 - 2026Q1.xlsx"
 
     DATABASE_URL = os.getenv(
-        "DATABASE_URL", "postgresql://dnpeng:dnpeng7240@localhost:5432/dnpeng_db"
+        "DATABASE_URL", "postgresql://postgres:rayy19@localhost:5432/dnpeng_db"
     )
 
     conn = psycopg2.connect(DATABASE_URL)
