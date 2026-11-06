@@ -72,7 +72,7 @@ if __name__ == "__main__":
     file_path = "data/indikator/regional/hs 2 digit prov/4a. Volume Ekspor Provinsi HS 2 Digit 2026Q1_30042026.xlsx"
 
     # DATABASE_URL = os.getenv(
-    #     "DATABASE_URL", "postgresql://dnpeng:dnpeng7240@localhost:5432/dnpeng_db"
+    #     "DATABASE_URL", "postgresql://postgres:rayy19@localhost:5432/dnpeng_db"
     # )
 
     # conn = psycopg2.connect(DATABASE_URL)

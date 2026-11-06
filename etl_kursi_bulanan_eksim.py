@@ -81,7 +81,7 @@ if __name__ == "__main__":
     file_path = "data/indikator/regional/Kursi bulanan eksim.xlsx"
 
     # DATABASE_URL = os.getenv(
-    #     "DATABASE_URL", "postgresql://dnpeng:dnpeng7240@localhost:5432/dnpeng_db"
+    #     "DATABASE_URL", "postgresql://postgres:rayy19@localhost:5432/dnpeng_db"
     # )
 
     # conn = psycopg2.connect(DATABASE_URL)

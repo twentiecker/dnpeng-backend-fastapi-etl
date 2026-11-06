@@ -72,10 +72,10 @@ def process_sheet(file_path, sheet_name):
 # =========================
 # Main ETL
 # =========================
-file_path = "data/indikator/pkrt_final_input.xlsx"
+file_path = "data\pkrt_dummy.xlsx"
 
 DATABASE_URL = os.getenv(
-    "DATABASE_URL", "postgresql://dnpeng:dnpeng7240@localhost:5432/dnpeng_db"
+    "DATABASE_URL", "postgresql://postgres:rayy19@localhost:5432/dnpeng_db"
 )
 
 conn = psycopg2.connect(DATABASE_URL)

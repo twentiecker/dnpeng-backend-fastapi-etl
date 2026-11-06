@@ -17,14 +17,14 @@ def process_sheet(file_path, sheet_name):
 
     df = pd.read_excel(file_path, sheet_name=sheet_name, header=0)
 
-    df.rename(
+    df = df.rename(
         columns={
             df.columns[0]: "kode_prov",
             df.columns[1]: "nama_prov",
             df.columns[2]: "kode_kako",
             df.columns[3]: "nama_kako",
         },
-        inplace=True,
+
     )
 
     df["kode_prov"] = df["kode_prov"].astype(str).str.strip()
@@ -84,7 +84,7 @@ if __name__ == "__main__":
     file_path = "data/indikator/regional/Tabulasi MFD 2023 sem 1.xlsx"
 
     DATABASE_URL = os.getenv(
-        "DATABASE_URL", "postgresql://dnpeng:dnpeng7240@localhost:5432/dnpeng_db"
+        "DATABASE_URL", "postgresql://postgres:rayy19@localhost:5432/dnpeng_db"
     )
 
     conn = psycopg2.connect(DATABASE_URL)
@@ -117,7 +117,7 @@ if __name__ == "__main__":
                         row["kode_wilayah"],
                         row["nama_wilayah"],
                         row["level"],
-                        row["parent_kode"],
+                        None if pd.isna(row["parent_kode"]) else row["parent_kode"],
                         row["created_at"],
                     ),
                 )
